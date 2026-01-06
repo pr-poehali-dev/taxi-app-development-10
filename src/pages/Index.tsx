@@ -44,7 +44,7 @@ export default function Index() {
                 <Icon name="Zap" size={24} className="text-white" />
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                TaxiGo
+                Такси Татьяна
               </h1>
             </div>
             <Avatar className="w-12 h-12 border-2 border-primary/20 cursor-pointer hover:scale-105 transition-transform">
