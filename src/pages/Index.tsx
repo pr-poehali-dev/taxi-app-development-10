@@ -15,6 +15,9 @@ export default function Index() {
   const [pickupLocation, setPickupLocation] = useState('');
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [selectedCar, setSelectedCar] = useState('comfort');
+  const [notificationTitle, setNotificationTitle] = useState('');
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [sentNotifications, setSentNotifications] = useState<Array<{id: string, title: string, message: string, date: string, recipients: number}>>([]);
 
   const carTypes = [
     { id: 'economy', name: 'Эконом', price: '150', icon: 'Car', time: '3 мин' },
@@ -33,6 +36,35 @@ export default function Index() {
     { id: '2', from: 'Офис', to: 'Дом', date: '14 дек', price: '320', rating: 5 },
     { id: '3', from: 'Ресторан', to: 'Кинотеатр', date: '12 дек', price: '180', rating: 4 },
   ];
+
+  const handleSendNotification = () => {
+    if (!notificationTitle || !notificationMessage) return;
+    
+    const newNotification = {
+      id: Date.now().toString(),
+      title: notificationTitle,
+      message: notificationMessage,
+      date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+      recipients: Math.floor(Math.random() * 500) + 100
+    };
+    
+    setSentNotifications([newNotification, ...sentNotifications]);
+    setNotificationTitle('');
+    setNotificationMessage('');
+    
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(notificationTitle, {
+        body: notificationMessage,
+        icon: 'https://cdn.poehali.dev/projects/28477501-9e4a-42fb-8a88-192c3f092e27/files/fcd4da9e-21de-42cd-84e4-712751effdf1.jpg'
+      });
+    }
+  };
+
+  const requestNotificationPermission = () => {
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -62,7 +94,7 @@ export default function Index() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 h-14 bg-white/80 backdrop-blur-sm shadow-lg">
+          <TabsList className="grid w-full grid-cols-5 mb-8 h-14 bg-white/80 backdrop-blur-sm shadow-lg">
             <TabsTrigger value="booking" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white">
               <Icon name="MapPin" size={18} />
               <span className="hidden sm:inline">Поездка</span>
@@ -78,6 +110,10 @@ export default function Index() {
             <TabsTrigger value="support" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white">
               <Icon name="MessageCircle" size={18} />
               <span className="hidden sm:inline">Помощь</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white">
+              <Icon name="Bell" size={18} />
+              <span className="hidden sm:inline">Рассылка</span>
             </TabsTrigger>
           </TabsList>
 
@@ -411,6 +447,154 @@ export default function Index() {
                       Отправить
                     </Button>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-6 animate-fade-in">
+            <Card className="shadow-xl border-none bg-white/90 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Icon name="Bell" size={24} className="text-primary" />
+                  Рассылка объявлений
+                </CardTitle>
+                <CardDescription>Отправляйте push-уведомления всем пассажирам</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Permission Banner */}
+                <Card className="bg-gradient-to-r from-accent/10 to-accent/5 border-accent/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+                          <Icon name="BellRing" size={20} className="text-accent" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">Push-уведомления</p>
+                          <p className="text-xs text-muted-foreground">Разрешите отправку уведомлений</p>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={requestNotificationPermission}
+                        size="sm" 
+                        variant="outline"
+                        className="border-accent/40 hover:bg-accent/10"
+                      >
+                        Разрешить
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Create Notification Form */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Icon name="PenSquare" size={20} className="text-primary" />
+                    Создать объявление
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="notification-title" className="text-base font-medium">
+                        Заголовок
+                      </Label>
+                      <Input
+                        id="notification-title"
+                        placeholder="Например: Акция выходного дня!"
+                        value={notificationTitle}
+                        onChange={(e) => setNotificationTitle(e.target.value)}
+                        className="h-12 text-base border-2 focus:border-primary"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="notification-message" className="text-base font-medium">
+                        Текст сообщения
+                      </Label>
+                      <textarea
+                        id="notification-message"
+                        placeholder="Опишите ваше предложение или новость..."
+                        value={notificationMessage}
+                        onChange={(e) => setNotificationMessage(e.target.value)}
+                        className="w-full min-h-32 p-3 rounded-lg border-2 border-input bg-background resize-none focus:border-primary focus:outline-none"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                      <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                        <CardContent className="p-4 text-center">
+                          <Icon name="Users" size={24} className="text-primary mx-auto mb-2" />
+                          <p className="text-2xl font-bold text-primary">
+                            {Math.floor(Math.random() * 500) + 100}
+                          </p>
+                          <p className="text-xs text-muted-foreground">Активных пользователей</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20">
+                        <CardContent className="p-4 text-center">
+                          <Icon name="Target" size={24} className="text-secondary mx-auto mb-2" />
+                          <p className="text-2xl font-bold text-secondary">100%</p>
+                          <p className="text-xs text-muted-foreground">Охват аудитории</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <Button
+                      onClick={handleSendNotification}
+                      disabled={!notificationTitle || !notificationMessage}
+                      className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg disabled:opacity-50"
+                    >
+                      <Icon name="Send" size={20} className="mr-2" />
+                      Отправить всем пассажирам
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Sent Notifications History */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Icon name="History" size={20} className="text-accent" />
+                    История отправленных
+                  </h3>
+                  {sentNotifications.length === 0 ? (
+                    <Card className="bg-muted/30">
+                      <CardContent className="p-8 text-center">
+                        <Icon name="Inbox" size={48} className="text-muted-foreground/40 mx-auto mb-3" />
+                        <p className="text-muted-foreground">Пока нет отправленных объявлений</p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="space-y-3">
+                      {sentNotifications.map((notification) => (
+                        <Card key={notification.id} className="hover:shadow-md transition-shadow bg-gradient-to-r from-white to-muted/10">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <Icon name="Bell" size={16} className="text-primary" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="font-semibold">{notification.title}</p>
+                                    <p className="text-sm text-muted-foreground line-clamp-2">{notification.message}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right ml-4">
+                                <Badge className="bg-primary/10 text-primary border-primary/20 mb-1">
+                                  <Icon name="Users" size={12} className="mr-1" />
+                                  {notification.recipients}
+                                </Badge>
+                                <p className="text-xs text-muted-foreground whitespace-nowrap">{notification.date}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
