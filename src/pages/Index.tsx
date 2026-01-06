@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import MapComponent from '@/components/MapComponent';
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState('booking');
@@ -121,13 +122,10 @@ export default function Index() {
                   </div>
                 </div>
 
-                {/* Map Placeholder */}
-                <div className="w-full h-64 bg-gradient-to-br from-muted/50 to-muted rounded-2xl flex items-center justify-center border-2 border-muted overflow-hidden">
-                  <div className="text-center space-y-3">
-                    <Icon name="Map" size={48} className="text-muted-foreground/40 mx-auto" />
-                    <p className="text-muted-foreground text-sm">Карта маршрута</p>
-                  </div>
-                </div>
+                {/* Map */}
+                <MapComponent onLocationSelect={(lat, lng) => {
+                  console.log('Location selected:', lat, lng);
+                }} />
 
                 {/* Car Selection */}
                 <div className="space-y-4">
