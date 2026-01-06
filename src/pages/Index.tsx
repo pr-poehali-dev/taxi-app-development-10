@@ -40,8 +40,12 @@ export default function Index() {
         <header className="mb-8 animate-fade-in">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
-                <Icon name="Zap" size={24} className="text-white" />
+              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-lg overflow-hidden">
+                <img 
+                  src="https://cdn.poehali.dev/projects/28477501-9e4a-42fb-8a88-192c3f092e27/files/fcd4da9e-21de-42cd-84e4-712751effdf1.jpg" 
+                  alt="Такси" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Такси Татьяна
